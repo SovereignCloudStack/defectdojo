@@ -1,0 +1,10 @@
+---
+- hosts: all
+  tasks:
+    - name: Docker setup
+      block:
+        - import_role: name=docker
+
+    - name: DefectDojo setup
+      block:
+        - import_role: name=defectdojo

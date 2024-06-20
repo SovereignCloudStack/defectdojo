@@ -1,0 +1,30 @@
+---
+- name: Clone DefectDojo repository
+  git:
+    repo: 'https://github.com/DefectDojo/django-DefectDojo.git'
+    dest: /opt/defectdojo
+    version: master
+
+- name: Build docker images
+  shell:
+    cmd: ./dc-build.sh
+    chdir: /opt/defectdojo/
+    
+- name: Start the application with postgres-redis profile
+  shell:
+    cmd: ./dc-up-d.sh postgres-redis
+    chdir: /opt/defectdojo/
+    
+- name: Wait for admin credentials
+  shell:
+    cmd: docker compose logs initializer | grep "Admin password:"
+    chdir: /opt/defectdojo/
+  register: defectdojo_status
+  until: "'Admin password:' in defectdojo_status.stdout"
+  retries: 5
+  delay: 60
+  ignore_errors: yes
+
+- name: Show admin credentials
+  debug:
+    msg: "{{ defectdojo_status.stdout }}"
