@@ -1,0 +1,3 @@
+---
+- import_tasks: defectdojo_setup.yaml
+  become: true
